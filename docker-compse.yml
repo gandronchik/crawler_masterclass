@@ -1,0 +1,67 @@
+version: "3"
+services:
+    hub:
+        image: selenium/hub
+        hostname: hub
+        ports:
+            - "4444:4444"
+        environment:
+            GRID_MAX_SESSION: 16
+            GRID_BROWSER_TIMEOUT: 3000
+            GRID_TIMEOUT: 3000
+    chrome:
+        image: selenium/node-chrome-debug
+        container_name: web-automation_chrome
+        depends_on:
+            - hub
+        environment:
+            HUB_PORT_4444_TCP_ADDR: hub
+            HUB_PORT_4444_TCP_PORT: 4444
+            NODE_MAX_SESSION: 4
+            NODE_MAX_INSTANCES: 4
+        volumes:
+            - /dev/shm:/dev/shm
+        ports:
+            - "9001:5900"
+        links:
+            - hub
+    redis:
+        image: redis
+        container_name: redis
+        hostname: redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+    crawler:
+        build: 
+            context: ./
+            dockerfile: ./Dockerfile.crawler
+        container_name: crawler
+        links:
+            - redis
+            - hub
+        depends_on:
+            - redis
+            - hub
+        environment:
+            - REDIS_URL=redis
+            - REDIS_PORT=6379
+            - TELEGRAM_TOKEN=1404734790:AAEsa7OXDG36EKKUIIpfuf6woeKjSn-nId0
+            - DRIVER_URL=http://hub:4444/wd/hub
+    observer:
+        build: 
+            context: ./
+            dockerfile: ./Dockerfile.observer
+        container_name: observer
+        links:
+            - redis
+        depends_on:
+            - redis
+        environment:
+            - REDIS_URL=redis
+            - REDIS_PORT=6379
+            - TELEGRAM_TOKEN=1404734790:AAEsa7OXDG36EKKUIIpfuf6woeKjSn-nId0
+
+volumes:
+    redis_data:
