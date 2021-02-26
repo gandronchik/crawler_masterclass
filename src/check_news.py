@@ -11,9 +11,13 @@ driver_url = os.environ.get('DRIVER_URL')
 redis = Redis(host=redis_url, port=redis_port)
 
 def main():
+    print("*************** STARTED ***************")
+
     sender = MessageSender(redis, telegram_token)
     rusbase = RuseBase(redis, sender, driver_url)
     rusbase.parse(["Технологии", "Бизнес"])
+
+    print("*************** COMPLETED ***************")
     
 
 if __name__ == "__main__":
