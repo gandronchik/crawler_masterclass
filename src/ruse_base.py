@@ -1,4 +1,3 @@
-from selenium import webdriver
 from bs4 import BeautifulSoup
 from redis import Redis
 from selenium import webdriver
@@ -8,7 +7,7 @@ class RuseBase:
     base_url = 'https://rb.ru'
     news_url = base_url + '/tag/technology/'
 
-    def __init__(self, redis, sender, driver_url):   
+    def __init__(self, redis, sender, driver_url):
         self.driver = webdriver.Remote(command_executor=driver_url, desired_capabilities=DesiredCapabilities.CHROME)
         self.redis = redis
         self.sender = sender

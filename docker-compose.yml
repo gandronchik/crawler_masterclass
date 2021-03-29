@@ -19,12 +19,8 @@ services:
             HUB_PORT_4444_TCP_PORT: 4444
             NODE_MAX_SESSION: 4
             NODE_MAX_INSTANCES: 4
-        volumes:
-            - /dev/shm:/dev/shm
         ports:
             - "9001:5900"
-        links:
-            - hub
     redis:
         image: redis
         container_name: redis
@@ -38,30 +34,30 @@ services:
             context: ./
             dockerfile: ./Dockerfile.crawler
         container_name: crawler
-        links:
-            - redis
-            - hub
+        volumes:
+            - "./:/code:rw"
         depends_on:
-            - redis
             - hub
+            - redis
         environment:
             - REDIS_URL=redis
             - REDIS_PORT=6379
-            - TELEGRAM_TOKEN=1404734790:AAEsa7OXDG36EKKUIIpfuf6woeKjSn-nId0
+            - TELEGRAM_TOKEN=YOUR_BOT_TOKEN
             - DRIVER_URL=http://hub:4444/wd/hub
+
     observer:
         build: 
             context: ./
             dockerfile: ./Dockerfile.observer
         container_name: observer
-        links:
-            - redis
+        volumes:
+            - "./:/code:rw"
         depends_on:
             - redis
         environment:
             - REDIS_URL=redis
             - REDIS_PORT=6379
-            - TELEGRAM_TOKEN=1404734790:AAEsa7OXDG36EKKUIIpfuf6woeKjSn-nId0
+            - TELEGRAM_TOKEN=YOUR_BOT_TOKEN
 
 volumes:
     redis_data:
